@@ -25,7 +25,7 @@ export const InputWrapper: React.FC<InputWrapperProps> = ({
 }) => {
   const [state, setState] = useState<AutocompleteState>({
     value: initialValue,
-    prevValue: initialValue,
+    prevValue: '', // 補完テスト用なので空文字から開始
     complements: [],
     selectionStart: 0,
     disabledChange: false,
@@ -40,21 +40,15 @@ export const InputWrapper: React.FC<InputWrapperProps> = ({
     if (state.disabledChange || !state.value.trim()) {
       return;
     }
-    
-    // 前回の値との差がない場合はスキップ
-    if (state.value === state.prevValue) {
-      return;
-    }
 
     console.log('補完処理開始:', { 
-      prevValue: state.prevValue, 
       currentValue: state.value 
     });
     
     setState(prev => ({ ...prev, isComplementing: true }));
 
     try {
-      const response = await generateCompletion(state.prevValue, state.value);
+      const response = await generateCompletion('', state.value);
       
       if (response && response.content !== state.value) {
         console.log('補完レスポンス:', response.content);
@@ -82,7 +76,7 @@ export const InputWrapper: React.FC<InputWrapperProps> = ({
       // エラー時もフラグをリセット
       setState(prev => ({ ...prev, isComplementing: false }));
     }
-  }, [state.value, state.prevValue, state.disabledChange, generateCompletion, textareaRef]);
+  }, [state.value, state.disabledChange, generateCompletion, textareaRef]);
 
   // 手動補完実行
   const handleManualCompletion = useCallback(() => {
@@ -133,26 +127,6 @@ export const InputWrapper: React.FC<InputWrapperProps> = ({
         setState(prev => ({ ...prev, disabledChange: false }));
       }, 300);
 
-    } else if (event.ctrlKey && event.key === 's') {
-      // Ctrl+S で保存
-      event.preventDefault();
-      setState(prev => ({
-        ...prev,
-        prevValue: prev.value,
-        complements: [],
-        isComplementing: false,
-      }));
-
-    } else if (event.metaKey && event.key === 's') {
-      // Cmd+S で保存（Mac）
-      event.preventDefault();
-      setState(prev => ({
-        ...prev,
-        prevValue: prev.value,
-        complements: [],
-        isComplementing: false,
-      }));
-
     } else if (state.complements.length > 0) {
       // その他のキーで補完をキャンセル
       setState(prev => ({
@@ -174,27 +148,6 @@ export const InputWrapper: React.FC<InputWrapperProps> = ({
           disabled={isLoading || state.disabledChange}
         >
           {isLoading ? '補完生成中...' : '🪄 AI補完実行'}
-        </button>
-        
-        <button
-          className="save-btn"
-          onClick={() => {
-            setState(prev => ({
-              ...prev,
-              prevValue: prev.value,
-              complements: [],
-              isComplementing: false,
-            }));
-            // 保存後もフォーカスを維持
-            setTimeout(() => {
-              if (textareaRef.current) {
-                textareaRef.current.focus();
-              }
-            }, 0);
-          }}
-          onMouseDown={(e) => e.preventDefault()} // フォーカス移動を防ぐ
-        >
-          💾 保存 (Ctrl+S)
         </button>
       </div>
       

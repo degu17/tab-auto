@@ -50,7 +50,7 @@ npm install
 2. `src/App.tsx`の以下の行を編集してAPIキーを設定：
 
 ```typescript
-const [apiKey, setApiKey] = useState<string>('YOUR_API_KEY_HERE');
+const apiKey = 'YOUR_API_KEY_HERE';
 ```
 
 ### 4. 開発サーバーの起動
