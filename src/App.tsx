@@ -1,4 +1,3 @@
-import React from 'react';
 import { InputWrapper } from './components/InputWrapper';
 import './App.css';
 

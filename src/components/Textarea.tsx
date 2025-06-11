@@ -1,4 +1,5 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
+import type React from 'react';
 
 interface TextareaProps {
   /** 入力値 */
